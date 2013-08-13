@@ -2,10 +2,10 @@
 #title           :wildfly-install.sh
 #description     :The script to install Wildfly 8.x
 #author	         :Dmitriy Sukharev
-#date            :20130726
+#date            :20130813
 #usage           :/bin/bash wildfly-install.sh
 
-WILDFLY_VERSION=8.0.0.Alpha3
+WILDFLY_VERSION=8.0.0.Alpha4
 WILDFLY_FILENAME=wildfly-$WILDFLY_VERSION
 WILDFLY_ARCHIVE_NAME=$WILDFLY_FILENAME.tar.gz 
 WILDFLY_DOWNLOAD_ADDRESS=http://download.jboss.org/wildfly/$WILDFLY_VERSION/$WILDFLY_ARCHIVE_NAME
@@ -99,6 +99,7 @@ sed -i -e 's,<inet-address value="${jboss.bind.address:127.0.0.1}"/>,<any-addres
 sed -i -e 's,<socket-binding name="ajp" port="${jboss.ajp.port:8009}"/>,<socket-binding name="ajp" port="${jboss.ajp.port:28009}"/>,g' $WILDFLY_DIR/standalone/configuration/standalone.xml
 sed -i -e 's,<socket-binding name="http" port="${jboss.http.port:8080}"/>,<socket-binding name="http" port="${jboss.http.port:28080}"/>,g' $WILDFLY_DIR/standalone/configuration/standalone.xml
 sed -i -e 's,<socket-binding name="https" port="${jboss.https.port:8443}"/>,<socket-binding name="https" port="${jboss.https.port:28443}"/>,g' $WILDFLY_DIR/standalone/configuration/standalone.xml
+sed -i -e 's,<socket-binding name="osgi-http" interface="management" port="8090"/>,<socket-binding name="osgi-http" interface="management" port="28090"/>,g' $WILDFLY_DIR/standalone/configuration/standalone.xml
 
 service wildfly start
 
