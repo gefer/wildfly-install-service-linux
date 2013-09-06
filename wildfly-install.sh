@@ -18,6 +18,7 @@ WILDFLY_USER="wildfly"
 WILDFLY_SERVICE="wildfly"
 
 WILDFLY_STARTUP_TIMEOUT=240
+WILDFLY_SHUTDOWN_TIMEOUT=30
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
@@ -40,7 +41,7 @@ echo "Cleaning up..."
 rm -f "$WILDFLY_DIR"
 rm -rf "$WILDFLY_FULL_DIR"
 rm -rf "/var/run/$WILDFLY_SERVICE/"
-rm -f /etc/init.d/$WILDFLY_SERVICE
+rm -f "/etc/init.d/$WILDFLY_SERVICE"
 
 echo "Installation..."
 mkdir $WILDFLY_FULL_DIR
@@ -52,6 +53,22 @@ chown -R $WILDFLY_USER:$WILDFLY_USER $WILDFLY_DIR/
 #rm $WILDFLY_ARCHIVE_NAME
 
 echo "Registrating Wildfly as service..."
+# if Debian-like distribution
+if [ -r /lib/lsb/init-functions ]; then
+    cp $WILDFLY_DIR/bin/init.d/wildfly-init-debian.sh /etc/init.d/$WILDFLY_SERVICE
+    sed -i -e 's,NAME=wildfly,NAME='$WILDFLY_SERVICE',g' /etc/init.d/$WILDFLY_SERVICE
+    WILDFLY_SERVICE_CONF=/etc/default/$WILDFLY_SERVICE
+fi
+
+# if RHEL-like distribution
+if [ -r /etc/init.d/functions ]; then
+    cp $WILDFLY_DIR/bin/init.d/jboss-as-standalone.sh /etc/init.d/$WILDFLY_SERVICE
+    mkdir -p /etc/jboss-as
+    WILDFLY_SERVICE_CONF=/etc/jboss-as/jboss-as.conf
+fi
+
+# if neigther Debian nor RHEL like distribution
+if [ ! -r /lib/lsb/init-functions -a ! -r /etc/init.d/functions ]; then
 cat > /etc/init.d/$WILDFLY_SERVICE << "EOF"
 #!/bin/sh
 ### BEGIN INIT INFO
@@ -90,9 +107,19 @@ esac
 exit 0
 EOF
 sed -i -e 's,${WILDFLY_USER},'$WILDFLY_USER',g; s,${WILDFLY_FILENAME},'$WILDFLY_FILENAME',g; s,${WILDFLY_SERVICE},'$WILDFLY_SERVICE',g; s,${WILDFLY_DIR},'$WILDFLY_DIR',g' /etc/init.d/$WILDFLY_SERVICE
+fi
+
 chmod 755 /etc/init.d/$WILDFLY_SERVICE
 
-echo "Configurating..."
+if [ ! -z "$WILDFLY_SERVICE_CONF" ]; then
+    echo "Configuring service..."
+    echo JBOSS_HOME=\"$WILDFLY_DIR\" > $WILDFLY_SERVICE_CONF
+    echo JBOSS_USER=$WILDFLY_USER >> $WILDFLY_SERVICE_CONF
+    echo STARTUP_WAIT=$WILDFLY_STARTUP_TIMEOUT >> $WILDFLY_SERVICE_CONF
+    echo SHUTDOWN_WAIT=$WILDFLY_SHUTDOWN_TIMEOUT >> $WILDFLY_SERVICE_CONF
+fi
+
+echo "Configuring application server..."
 sed -i -e 's,<deployment-scanner path="deployments" relative-to="jboss.server.base.dir" scan-interval="5000"/>,<deployment-scanner path="deployments" relative-to="jboss.server.base.dir" scan-interval="5000" deployment-timeout="'$WILDFLY_STARTUP_TIMEOUT'"/>,g' $WILDFLY_DIR/standalone/configuration/standalone.xml
 #sed -i -e 's,<virtual-server name="default-host" enable-welcome-root="true">,<virtual-server name="default-host" enable-welcome-root="false">,g' $WILDFLY_DIR/standalone/configuration/standalone.xml # looks like applications can be deployed to root without this property now
 sed -i -e 's,<inet-address value="${jboss.bind.address:127.0.0.1}"/>,<any-address/>,g' $WILDFLY_DIR/standalone/configuration/standalone.xml
@@ -101,6 +128,6 @@ sed -i -e 's,<socket-binding name="http" port="${jboss.http.port:8080}"/>,<socke
 sed -i -e 's,<socket-binding name="https" port="${jboss.https.port:8443}"/>,<socket-binding name="https" port="${jboss.https.port:28443}"/>,g' $WILDFLY_DIR/standalone/configuration/standalone.xml
 sed -i -e 's,<socket-binding name="osgi-http" interface="management" port="8090"/>,<socket-binding name="osgi-http" interface="management" port="28090"/>,g' $WILDFLY_DIR/standalone/configuration/standalone.xml
 
-service wildfly start
+service $WILDFLY_SERVICE start
 
 echo "Done."
