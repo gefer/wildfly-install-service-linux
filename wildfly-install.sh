@@ -67,7 +67,7 @@ if [ -r /etc/init.d/functions ]; then
     WILDFLY_SERVICE_CONF=/etc/jboss-as/jboss-as.conf
 fi
 
-# if neigther Debian nor RHEL like distribution
+# if neither Debian nor RHEL like distribution
 if [ ! -r /lib/lsb/init-functions -a ! -r /etc/init.d/functions ]; then
 cat > /etc/init.d/$WILDFLY_SERVICE << "EOF"
 #!/bin/sh
