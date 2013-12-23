@@ -2,12 +2,12 @@
 #title           :wildfly-install.sh
 #description     :The script to install Wildfly 8.x
 #author	         :Dmitriy Sukharev
-#date            :20131121
+#date            :20131222
 #usage           :/bin/bash wildfly-install.sh
 
-WILDFLY_VERSION=8.0.0.Beta1
+WILDFLY_VERSION=8.0.0.CR1
 WILDFLY_FILENAME=wildfly-$WILDFLY_VERSION
-WILDFLY_ARCHIVE_NAME=$WILDFLY_FILENAME.tar.gz 
+WILDFLY_ARCHIVE_NAME=$WILDFLY_FILENAME.tar.gz
 WILDFLY_DOWNLOAD_ADDRESS=http://download.jboss.org/wildfly/$WILDFLY_VERSION/$WILDFLY_ARCHIVE_NAME
 
 INSTALL_DIR=/opt
@@ -55,8 +55,7 @@ chown -R $WILDFLY_USER:$WILDFLY_USER $WILDFLY_DIR/
 echo "Registrating Wildfly as service..."
 # if Debian-like distribution
 if [ -r /lib/lsb/init-functions ]; then
-    #cp $WILDFLY_DIR/bin/init.d/wildfly-init-debian.sh /etc/init.d/$WILDFLY_SERVICE
-    wget https://dl.dropboxusercontent.com/u/5339027/shared/dsps/wildfly-init-debian.sh -q -O /etc/init.d/$WILDFLY_SERVICE # Temporary: https://github.com/wildfly/wildfly/pull/5502
+    cp $WILDFLY_DIR/bin/init.d/wildfly-init-debian.sh /etc/init.d/$WILDFLY_SERVICE
     sed -i -e 's,NAME=wildfly,NAME='$WILDFLY_SERVICE',g' /etc/init.d/$WILDFLY_SERVICE
     WILDFLY_SERVICE_CONF=/etc/default/$WILDFLY_SERVICE
 fi
@@ -64,7 +63,6 @@ fi
 # if RHEL-like distribution
 if [ -r /etc/init.d/functions ]; then
     cp $WILDFLY_DIR/bin/init.d/wildfly-init-redhat.sh /etc/init.d/$WILDFLY_SERVICE
-    sed -i "s,JBOSS_PIDFILE=/var/run/wilfly/wildfly.pid,JBOSS_PIDFILE=/var/run/wildfly/wildfly.pid,g" /etc/init.d/$WILDFLY_SERVICE # Temporary: https://github.com/wildfly/wildfly/pull/5405
     WILDFLY_SERVICE_CONF=/etc/default/wildfly.conf
 fi
 
@@ -107,7 +105,7 @@ exit 1
 esac
 exit 0
 EOF
-sed -i -e 's,${WILDFLY_USER},'$WILDFLY_USER',g; s,${WILDFLY_FILENAME},'$WILDFLY_FILENAME',g; s,${WILDFLY_SERVICE},'$WILDFLY_SERVICE',g; s,${WILDFLY_DIR},'$WILDFLY_DIR',g' /etc/init.d/$WILDFLY_SERVICE
+sed -i -e 's,${WILDFLY_USER},'$WILDFLY_USER',g; s,${WILDFLY_FILENAME},'$WILDFLY_FILENAME',g; s,${WILDFLY_SERVICE},'$WILDFLY_SERVICE',g; s,${WILDFLY_DIR},'$WILDFLY_DIR',g' /etc/init.d/$WILDFLY_SERVICE # TODO do I need this???
 fi
 
 chmod 755 /etc/init.d/$WILDFLY_SERVICE
