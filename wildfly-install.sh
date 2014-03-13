@@ -1,11 +1,12 @@
 #!/bin/bash
 #title           :wildfly-install.sh
 #description     :The script to install Wildfly 8.x
+#more            :http://sukharevd.net/wildfly-8-installation.html
 #author	         :Dmitriy Sukharev
-#date            :20131222
+#date            :20140312
 #usage           :/bin/bash wildfly-install.sh
 
-WILDFLY_VERSION=8.0.0.CR1
+WILDFLY_VERSION=8.0.0.Final
 WILDFLY_FILENAME=wildfly-$WILDFLY_VERSION
 WILDFLY_ARCHIVE_NAME=$WILDFLY_FILENAME.tar.gz
 WILDFLY_DOWNLOAD_ADDRESS=http://download.jboss.org/wildfly/$WILDFLY_VERSION/$WILDFLY_ARCHIVE_NAME
@@ -50,7 +51,6 @@ ln -s $WILDFLY_FULL_DIR/ $WILDFLY_DIR
 useradd -s /sbin/nologin $WILDFLY_USER
 chown -R $WILDFLY_USER:$WILDFLY_USER $WILDFLY_DIR
 chown -R $WILDFLY_USER:$WILDFLY_USER $WILDFLY_DIR/
-#rm $WILDFLY_ARCHIVE_NAME
 
 echo "Registrating Wildfly as service..."
 # if Debian-like distribution
@@ -120,7 +120,6 @@ fi
 
 echo "Configuring application server..."
 sed -i -e 's,<deployment-scanner path="deployments" relative-to="jboss.server.base.dir" scan-interval="5000"/>,<deployment-scanner path="deployments" relative-to="jboss.server.base.dir" scan-interval="5000" deployment-timeout="'$WILDFLY_STARTUP_TIMEOUT'"/>,g' $WILDFLY_DIR/standalone/configuration/standalone.xml
-#sed -i -e 's,<virtual-server name="default-host" enable-welcome-root="true">,<virtual-server name="default-host" enable-welcome-root="false">,g' $WILDFLY_DIR/standalone/configuration/standalone.xml # looks like applications can be deployed to root without this property now
 sed -i -e 's,<inet-address value="${jboss.bind.address:127.0.0.1}"/>,<any-address/>,g' $WILDFLY_DIR/standalone/configuration/standalone.xml
 sed -i -e 's,<socket-binding name="ajp" port="${jboss.ajp.port:8009}"/>,<socket-binding name="ajp" port="${jboss.ajp.port:28009}"/>,g' $WILDFLY_DIR/standalone/configuration/standalone.xml
 sed -i -e 's,<socket-binding name="http" port="${jboss.http.port:8080}"/>,<socket-binding name="http" port="${jboss.http.port:28080}"/>,g' $WILDFLY_DIR/standalone/configuration/standalone.xml
