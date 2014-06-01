@@ -3,7 +3,7 @@
 #description     :The script to install Wildfly 8.x
 #more            :http://sukharevd.net/wildfly-8-installation.html
 #author	         :Dmitriy Sukharev
-#date            :20140312
+#date            :20140601
 #usage           :/bin/bash wildfly-install.sh
 
 WILDFLY_VERSION=8.1.0.Final
