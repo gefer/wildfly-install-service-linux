@@ -3,10 +3,10 @@
 #description     :The script to install Wildfly 9.x
 #more            :http://sukharevd.net/wildfly-8-installation.html
 #author	         :Dmitriy Sukharev
-#date            :20150705
+#date            :20150726
 #usage           :/bin/bash wildfly-install.sh
 
-WILDFLY_VERSION=9.0.0.Final
+WILDFLY_VERSION=9.0.1.Final
 WILDFLY_FILENAME=wildfly-$WILDFLY_VERSION
 WILDFLY_ARCHIVE_NAME=$WILDFLY_FILENAME.tar.gz
 WILDFLY_DOWNLOAD_ADDRESS=http://download.jboss.org/wildfly/$WILDFLY_VERSION/$WILDFLY_ARCHIVE_NAME
