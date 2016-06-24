@@ -3,12 +3,14 @@
 #description     :The script to install Wildfly 10.x
 #more            :http://sukharevd.net/wildfly-8-installation.html
 #author	         :Dmitriy Sukharev
-#date            :2015-10-24T17:14-0700
+#date            :2016-06-18T02:45-0700
 #usage           :/bin/bash wildfly-install.sh
-#tested-version  :10.0.0.CR3
-#tested-distros  :Debian 7,8; Ubuntu 15.10; CentOS 7; Fedora 22 
+#tested-version1 :10.0.0.CR3
+#tested-distros1 :Ubuntu 15.10; Debian 7,8; CentOS 7; Fedora 22 
+#tested-version2 :10.0.0.Final
+#tested-distros2 :Debian 8
 
-WILDFLY_VERSION=10.0.0.CR4
+WILDFLY_VERSION=10.0.0.Final
 WILDFLY_FILENAME=wildfly-$WILDFLY_VERSION
 WILDFLY_ARCHIVE_NAME=$WILDFLY_FILENAME.tar.gz
 WILDFLY_DOWNLOAD_ADDRESS=http://download.jboss.org/wildfly/$WILDFLY_VERSION/$WILDFLY_ARCHIVE_NAME
